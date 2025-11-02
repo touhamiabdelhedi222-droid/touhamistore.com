@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Honey Shop</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #ffd700 0%, #ffb347 50%, #ff8c00 100%);
+            min-height: 100%;
+            position: relative;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        /* Animated bee background */
+        .bee-animation {
+            position: fixed;
+            font-size: 2rem;
+            animation: fly 15s linear infinite;
+            z-index: 1;
+            opacity: 0.3;
+        }
+
+        @keyframes fly {
+            0% { transform: translateX(-100px) translateY(50px); }
+            25% { transform: translateX(300px) translateY(100px); }
+            50% { transform: translateX(600px) translateY(200px); }
+            75% { transform: translateX(900px) translateY(150px); }
+            100% { transform: translateX(1300px) translateY(80px); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 3px solid #8B4513;
+        }
+
+        .shop-name {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .bee-icon {
+            font-size: 3rem;
+            animation: buzz 2s ease-in-out infinite;
+        }
+
+        @keyframes buzz {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .tagline {
+            font-size: 1.3rem;
+            color: #654321;
+            font-style: italic;
+        }
+
+        .demo-notice {
+            background: #fff3cd;
+            border: 2px solid #8B4513;
+            color: #856404;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .honey-jar {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 3px solid #DAA520;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .honey-jar:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.2);
+        }
+
+        .honey-jar::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .jar-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            display: block;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+        }
+
+        .honey-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 15px;
+        }
+
+        .honey-description {
+            color: #654321;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .honey-price {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #B8860B;
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .buy-button {
+            background: linear-gradient(45deg, #FF6347, #FF4500);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 99, 71, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .buy-button:hover {
+            background: linear-gradient(45deg, #FF4500, #FF6347);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 99, 71, 0.4);
+        }
+
+        .cart-sidebar {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100%;
+            background: rgba(255, 248, 220, 0.98);
+            border-left: 3px solid #8B4513;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+            transition: right 0.4s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .cart-sidebar.open {
+            right: 0;
+        }
+
+        .cart-header {
+            padding: 25px;
+            background: linear-gradient(45deg, #8B4513, #A0522D);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .close-cart:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .cart-items {
+            padding: 25px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 2px solid #DAA520;
+            background: rgba(255,255,255,0.5);
+            margin-bottom: 15px;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .cart-item-price {
+            color: #B8860B;
+            font-weight: bold;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .quantity-btn {
+            width: 35px;
+            height: 35px;
+            border: 2px solid #8B4513;
+            background: white;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #8B4513;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #8B4513;
+            color: white;
+        }
+
+        .cart-total {
+            padding: 25px;
+            border-top: 3px solid #8B4513;
+            background: rgba(255,255,255,0.8);
+        }
+
+        .total-amount {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #8B4513;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(45deg, #32CD32, #228B22);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .checkout-btn:hover {
+            background: linear-gradient(45deg, #228B22, #32CD32);
+            transform: translateY(-2px);
+        }
+
+        .cart-toggle {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: linear-gradient(45deg, #FF6347, #FF4500);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 99, 71, 0.4);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .cart-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(255, 99, 71, 0.6);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #FFD700;
+            color: #8B4513;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: 2px solid white;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 50px 20px;
+            color: #8B4513;
+        }
+
+        .empty-cart-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .honeycomb-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            z-index: 1;
+            pointer-events: none;
+            background-image: 
+                radial-gradient(circle at 25% 25%, #FFD700 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, #FFD700 2px, transparent 2px);
+            background-size: 50px 50px;
+        }
+
+        @media (max-width: 768px) {
+            .shop-name {
+                font-size: 2.5rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .cart-sidebar {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .honey-jar {
+                padding: 20px;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="honeycomb-pattern"></div><!-- Animated bees -->
+  <div class="bee-animation" style="top: 10%; animation-delay: 0s;">
+   🐝
+  </div>
+  <div class="bee-animation" style="top: 30%; animation-delay: 5s;">
+   🐝
+  </div>
+  <div class="bee-animation" style="top: 60%; animation-delay: 10s;">
+   🐝
+  </div>
+  <div class="container">
+   <div class="demo-notice">
+    🍯 <strong>Demo Honey Shop</strong> 🍯<br>
+     This is a sample honey store. No real purchases or payments are processed.
+       <p> <strong>👉 To buy, click on the green button at the bottom. Thank you.</strong></p>
+   </div>
+   <header class="header">
+    <h1 class="shop-name"><span class="bee-icon">🐝</span> <span id="shopName">TOUHAMI STORE</span> <span class="bee-icon">🐝</span></h1>
+    <p class="tagline" id="tagline">Pure, natural honey straight from our hives</p>
+    <div style="margin-top: 20px; padding: 15px; background: rgba(255,215,0,0.2); border-radius: 10px; border: 2px solid #DAA520;">
+     <p style="color: #8B4513; font-weight: bold; margin-bottom: 8px;">📞 Contact Us:</p>
+     <p style="color: #8B4513; margin: 3px 0; font-size: 1rem;">📱 Instagram: <strong>@touhami__store</strong></p>
+     <p style="color: #8B4513; margin: 3px 0; font-size: 1rem;">📞 Phone: <strong>+216 26824634</strong></p>
+     <p style="color: #8B4513; margin: 3px 0; font-size: 1rem;">📧 Email: <strong>touhamiabdelhedi222@gmail.com</strong></p>
+     <p style="color: #8B4513; margin: 3px 0; font-size: 1rem;">Generator: <strong>touhami___abdelhedi_07</strong></p>
+    </div>
+   </header>
+   <div class="products-grid">
+    <div class="honey-jar"><span class="jar-icon">🍯</span>
+     <h3 class="honey-name" id="featuredHoney">SEDR Honey</h3>
+     <p class="honey-description">A delicate blend of wildflower nectar with floral notes and a smooth finish</p>
+     <p class="honey-KG">1KG</p>
+     <div class="honey-price">
+      70DT
+     </div><button class="buy-button" onclick="addToCart('SEDER Honey 1KG', 70)"> <span id="buyButtonText">Buy Now</span> 🛒 </button>
+    </div>
+    <div class="honey-jar"><span class="jar-icon">🍯</span>
+     <h3 class="honey-name">SEDER Honey</h3>
+     <p class="honey-description">Light and sweet with a mild flavor, perfect for tea and baking</p>
+     <p class="honey-KG">500G</p>
+     <div class="honey-price">
+      35DT
+     </div><button class="buy-button" onclick="addToCart('SEDER Honey 500G', 35)"> Buy Now 🛒 </button>
+    </div>
+    <div class="honey-jar"><span class="jar-icon">🍯</span>
+     <h3 class="honey-name">SEDER Honey</h3>
+     <p class="honey-description">Premium Tunisian honey, pure and authentic with an unmatched taste</p>
+     <p class="honey-KG">250G</p>
+     <div class="honey-price">
+      20 DT
+     </div><button class="buy-button" onclick="addToCart('SEDER Honey 250G', 20)"> Buy Now 🛒 </button>
+    </div>
+   </div>
+  </div><button class="cart-toggle" onclick="toggleCart()"> 🛒 <span class="cart-count" id="cartCount">0</span> </button>
+  <div class="cart-sidebar" id="cartSidebar">
+   <div class="cart-header">
+    <div class="cart-title">
+     🍯 Your Honey Cart
+    </div><button class="close-cart" onclick="toggleCart()">×</button>
+   </div>
+   <div class="cart-items" id="cartItems">
+    <div class="empty-cart">
+     <div class="empty-cart-icon">
+      🍯
+     </div>
+     <p><strong>Your cart is empty</strong></p>
+     <p>Add some delicious honey!</p>
+    </div>
+   </div>
+   <div class="cart-total" id="cartTotal" style="display: none;">
+    <div class="total-amount" id="totalAmount">
+     Total: $0.00
+    </div><button class="checkout-btn" onclick="checkout()"> 🐝 Complete Purchase 🐝 </button>
+   </div>
+  </div>
+  <script>
+        let cart = [];
+
+        const defaultConfig = {
+            shop_name: "TOUHAMI STORE",
+            tagline: "Pure, natural honey straight from our hives",
+            featured_honey: "Wildflower Honey",
+            buy_button_text: "Buy Now"
+        };
+
+        function addToCart(name, price) {
+            const existingItem = cart.find(item => item.name === name);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ name, price, quantity: 1 });
+            }
+            
+            updateCartDisplay();
+            
+            // Show add to cart animation
+            showAddToCartFeedback();
+        }
+
+        function showAddToCartFeedback() {
+            const cartButton = document.querySelector('.cart-toggle');
+            cartButton.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                cartButton.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        function removeFromCart(name) {
+            const itemIndex = cart.findIndex(item => item.name === name);
+            if (itemIndex > -1) {
+                cart.splice(itemIndex, 1);
+                updateCartDisplay();
+            }
+        }
+
+        function updateQuantity(name, change) {
+            const item = cart.find(item => item.name === name);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(name);
+                } else {
+                    updateCartDisplay();
+                }
+            }
+        }
+
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cartItems');
+            const cartCount = document.getElementById('cartCount');
+            const cartTotal = document.getElementById('cartTotal');
+            const totalAmount = document.getElementById('totalAmount');
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="empty-cart">
+                        <div class="empty-cart-icon">🍯</div>
+                        <p><strong>Your cart is empty</strong></p>
+                        <p>Add some delicious honey!</p>
+                    </div>
+                `;
+                cartTotal.style.display = 'none';
+                cartCount.textContent = '0';
+                return;
+            }
+            
+            let total = 0;
+            let itemCount = 0;
+            
+            cartItems.innerHTML = cart.map(item => {
+                total += item.price * item.quantity;
+                itemCount += item.quantity;
+                
+                return `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">🍯 ${item.name}</div>
+                            <div class="cart-item-price">$${item.price.toFixed(2)} each</div>
+                        </div>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="updateQuantity('${item.name}', -1)">-</button>
+                            <span style="font-weight: bold; color: #8B4513;">${item.quantity}</span>
+                            <button class="quantity-btn" onclick="updateQuantity('${item.name}', 1)">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            cartCount.textContent = itemCount;
+            totalAmount.textContent = `Total: $${total.toFixed(2)}`;
+            cartTotal.style.display = 'block';
+        }
+
+        function toggleCart() {
+            const cartSidebar = document.getElementById('cartSidebar');
+            cartSidebar.classList.toggle('open');
+        }
+
+        function checkout() {
+            if (cart.length === 0) return;
+            
+            const orderSummary = cart.map(item => 
+                `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`
+            ).join('\n');
+            
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            // Show order confirmation
+            const confirmationDiv = document.createElement('div');
+            confirmationDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(255, 248, 220, 0.98);
+                padding: 40px;
+                border-radius: 20px;
+                box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+                z-index: 2000;
+                max-width: 500px;
+                text-align: center;
+                border: 3px solid #8B4513;
+            `;
+            
+            confirmationDiv.innerHTML = `
+                <h3 style="color: #32CD32; margin-bottom: 25px; font-size: 1.8rem;">
+                    🐝 Order Confirmed! 🍯
+                </h3>
+                <p style="margin-bottom: 20px; font-weight: bold; color: #8B4513;">
+                    Demo Order Summary:
+                </p>
+                <div style="text-align: left; background: rgba(255,255,255,0.8); padding: 20px; border-radius: 10px; margin-bottom: 25px; border: 2px solid #DAA520;">
+                    ${orderSummary.replace(/\n/g, '<br>')}
+                    <hr style="margin: 15px 0; border: 1px solid #DAA520;">
+                    <strong style="color: #8B4513; font-size: 1.2rem;">Total: $${total.toFixed(2)}</strong>
+                </div>
+                <p style="color: #666; font-size: 0.95rem; margin-bottom: 15px; font-style: italic;">
+                    This is a demo honey shop - no real order has been placed or payment processed.
+                </p>
+                <div style="background: rgba(255,215,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #DAA520;">
+                    <p style="color: #8B4513; font-weight: bold; margin-bottom: 10px;">📞 To place a real order, contact:</p>
+                    <p style="color: #8B4513; margin: 5px 0;">📱 Instagram: <strong>@touhami__store</strong></p>
+                    <p style="color: #8B4513; margin: 5px 0;">📞 Phone: <strong>+216 26824634</strong></p>
+                    <p style="color: #8B4513; margin: 5px 0;">📧 Email: <strong>touhamiabdelhedi222@gmail.com</strong></p>
+                    <p style="color: #8B4513; margin: 5px 0;">📱 Generator: <strong>@touhami___abdelhedi_07</strong></p>
+                </div>
+                <button onclick="this.parentElement.remove()" style="
+                    background: linear-gradient(45deg, #32CD32, #228B22);
+                    color: white;
+                    border: none;
+                    padding: 15px 30px;
+                    border-radius: 15px;
+                    cursor: pointer;
+                    font-weight: bold;
+                    font-size: 1.1rem;
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                    🐝 Close 🐝
+                </button>
+            `;
+            
+            document.body.appendChild(confirmationDiv);
+            
+            // Clear cart
+            cart = [];
+            updateCartDisplay();
+            toggleCart();
+        }
+
+        // Element SDK implementation
+        async function onConfigChange(config) {
+            const customFont = config.font_family || defaultConfig.font_family || 'Georgia';
+            const baseSize = config.font_size || 16;
+            const baseFontStack = 'serif';
+
+            // Apply font family
+            document.body.style.fontFamily = `${customFont}, ${baseFontStack}`;
+
+            // Apply font sizing
+            document.querySelector('.shop-name').style.fontSize = `${baseSize * 2.2}px`;
+            document.querySelector('.tagline').style.fontSize = `${baseSize * 0.8}px`;
+            document.querySelectorAll('.honey-name').forEach(el => el.style.fontSize = `${baseSize * 1.1}px`);
+            document.querySelectorAll('.honey-description').forEach(el => el.style.fontSize = `${baseSize * 0.9}px`);
+
+            // Apply colors
+            if (config.background_color) {
+                document.body.style.background = `linear-gradient(135deg, ${config.background_color} 0%, #ffb347 50%, #ff8c00 100%)`;
+            }
+            
+            if (config.card_color) {
+                document.querySelectorAll('.honey-jar').forEach(jar => {
+                    jar.style.background = config.card_color;
+                });
+                document.querySelector('.header').style.background = config.card_color;
+            }
+            
+            if (config.text_color) {
+                document.querySelectorAll('.honey-name, .shop-name, .tagline').forEach(el => {
+                    el.style.color = config.text_color;
+                });
+            }
+            
+            if (config.primary_button_color) {
+                document.querySelectorAll('.buy-button').forEach(btn => {
+                    btn.style.background = `linear-gradient(45deg, ${config.primary_button_color}, #FF4500)`;
+                });
+            }
+            
+            if (config.accent_color) {
+                document.querySelectorAll('.honey-price').forEach(price => {
+                    price.style.color = config.accent_color;
+                });
+            }
+
+            // Update text content
+            document.getElementById('shopName').textContent = config.shop_name || defaultConfig.shop_name;
+            document.getElementById('tagline').textContent = config.tagline || defaultConfig.tagline;
+            document.getElementById('featuredHoney').textContent = config.featured_honey || defaultConfig.featured_honey;
+            document.getElementById('buyButtonText').textContent = config.buy_button_text || defaultConfig.buy_button_text;
+        }
+
+        function mapToCapabilities(config) {
+            return {
+                recolorables: [
+                    {
+                        get: () => config.background_color || "#ffd700",
+                        set: (value) => {
+                            config.background_color = value;
+                            window.elementSdk.setConfig({ background_color: value });
+                        }
+                    },
+                    {
+                        get: () => config.card_color || "#ffffff",
+                        set: (value) => {
+                            config.card_color = value;
+                            window.elementSdk.setConfig({ card_color: value });
+                        }
+                    },
+                    {
+                        get: () => config.text_color || "#8B4513",
+                        set: (value) => {
+                            config.text_color = value;
+                            window.elementSdk.setConfig({ text_color: value });
+                        }
+                    },
+                    {
+                        get: () => config.primary_button_color || "#FF6347",
+                        set: (value) => {
+                            config.primary_button_color = value;
+                            window.elementSdk.setConfig({ primary_button_color: value });
+                        }
+                    },
+                    {
+                        get: () => config.accent_color || "#B8860B",
+                        set: (value) => {
+                            config.accent_color = value;
+                            window.elementSdk.setConfig({ accent_color: value });
+                        }
+                    }
+                ],
+                borderables: [],
+                fontEditable: {
+                    get: () => config.font_family || "Georgia",
+                    set: (value) => {
+                        config.font_family = value;
+                        window.elementSdk.setConfig({ font_family: value });
+                    }
+                },
+                fontSizeable: {
+                    get: () => config.font_size || 16,
+                    set: (value) => {
+                        config.font_size = value;
+                        window.elementSdk.setConfig({ font_size: value });
+                    }
+                }
+            };
+        }
+
+        function mapToEditPanelValues(config) {
+            return new Map([
+                ["shop_name", config.shop_name || defaultConfig.shop_name],
+                ["tagline", config.tagline || defaultConfig.tagline],
+                ["featured_honey", config.featured_honey || defaultConfig.featured_honey],
+                ["buy_button_text", config.buy_button_text || defaultConfig.buy_button_text]
+            ]);
+        }
+
+        // Initialize Element SDK
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig,
+                onConfigChange,
+                mapToCapabilities,
+                mapToEditPanelValues
+            });
+        }
+    </script>
+<!-- WhatsApp Order Button -->
+<a href="https://wa.me/21626824634?text=مرحبا%20،%20نحب%20نطلب%20عسل%20من%20متجر%20TOUHAMI%20🍯" 
+   target="_blank" 
+   style="
+     position: fixed;
+     bottom: 25px;
+     right: 25px;
+     background: linear-gradient(45deg, #25D366, #128C7E);
+     color: white;
+     border-radius: 50%;
+     width: 70px;
+     height: 70px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     font-size: 2rem;
+     box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+     text-decoration: none;
+     z-index: 9999;
+     transition: transform 0.3s ease;
+   "
+   onmouseover="this.style.transform='scale(1.1)'"
+   onmouseout="this.style.transform='scale(1)'">
+   💬
+</a>
+<!-- End WhatsApp Button -->
+
+ </html>
